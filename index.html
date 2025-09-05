@@ -3,369 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eLibera - Business Intelligence System</title>
+    <title>eLibera - Smart Dashboard Hub</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Application Window -->
-    <div class="app-window">
-        <!-- Title Bar -->
-        <div class="title-bar">
-            <div class="title-bar-left">
-                <div class="window-controls">
-                    <button class="control-btn minimize"></button>
-                    <button class="control-btn maximize"></button>
-                    <button class="control-btn close"></button>
-                </div>
-                <div class="app-title">
-                    <i class="fa fa-bar-chart"></i>
-                    eLibera Business Intelligence System
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span>eLibera</span>
             </div>
-            <div class="title-bar-right">
+            <div class="header-actions">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search everything..." id="globalSearch">
+                </div>
+                <button class="btn-refresh" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 <div class="user-info">
-                    <span class="user-name">John Doe</span>
-                    <span class="user-role">Administrator</span>
-                </div>
-                <div class="system-time" id="systemTime"></div>
-            </div>
-        </div>
-
-        <!-- Menu Bar -->
-        <div class="menu-bar">
-            <div class="menu-item">
-                <span>File</span>
-                <div class="menu-dropdown">
-                    <div class="menu-option">New Report</div>
-                    <div class="menu-option">Open Report</div>
-                    <div class="menu-option">Save Report</div>
-                    <div class="menu-separator"></div>
-                    <div class="menu-option">Export</div>
-                    <div class="menu-option">Print</div>
-                    <div class="menu-separator"></div>
-                    <div class="menu-option">Exit</div>
-                </div>
-            </div>
-            <div class="menu-item">
-                <span>Edit</span>
-                <div class="menu-dropdown">
-                    <div class="menu-option">Copy</div>
-                    <div class="menu-option">Paste</div>
-                    <div class="menu-option">Delete</div>
-                    <div class="menu-separator"></div>
-                    <div class="menu-option">Find</div>
-                    <div class="menu-option">Replace</div>
-                </div>
-            </div>
-            <div class="menu-item">
-                <span>View</span>
-                <div class="menu-dropdown">
-                    <div class="menu-option">Refresh</div>
-                    <div class="menu-option">Full Screen</div>
-                    <div class="menu-separator"></div>
-                    <div class="menu-option">Toolbar</div>
-                    <div class="menu-option">Status Bar</div>
-                </div>
-            </div>
-            <div class="menu-item">
-                <span>Tools</span>
-                <div class="menu-dropdown">
-                    <div class="menu-option">Options</div>
-                    <div class="menu-option">Settings</div>
-                    <div class="menu-separator"></div>
-                    <div class="menu-option">Database Connection</div>
-                </div>
-            </div>
-            <div class="menu-item">
-                <span>Help</span>
-                <div class="menu-dropdown">
-                    <div class="menu-option">User Manual</div>
-                    <div class="menu-option">About</div>
+                    <img src="https://via.placeholder.com/32" alt="User" class="user-avatar">
+                    <span>John Doe</span>
                 </div>
             </div>
         </div>
+    </header>
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <div class="toolbar-group">
-                <button class="toolbar-btn" title="New Report">
-                    <i class="fa fa-file-o"></i>
-                </button>
-                <button class="toolbar-btn" title="Open Report">
-                    <i class="fa fa-folder-open-o"></i>
-                </button>
-                <button class="toolbar-btn" title="Save Report">
-                    <i class="fa fa-floppy-o"></i>
-                </button>
-                <div class="toolbar-separator"></div>
-                <button class="toolbar-btn" title="Print">
-                    <i class="fa fa-print"></i>
-                </button>
-                <button class="toolbar-btn" title="Export">
-                    <i class="fa fa-download"></i>
-                </button>
-            </div>
-            <div class="toolbar-group">
-                <button class="toolbar-btn" title="Refresh">
-                    <i class="fa fa-refresh"></i>
-                </button>
-                <button class="toolbar-btn" title="Search">
-                    <i class="fa fa-search"></i>
-                </button>
-                <div class="toolbar-separator"></div>
-                <button class="toolbar-btn" title="Settings">
-                    <i class="fa fa-cog"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Application Area -->
-        <div class="main-area">
-            <!-- Left Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <h3>Navigation</h3>
-                </div>
-                <div class="sidebar-content">
-                    <div class="nav-section">
-                        <div class="nav-header">
-                            <i class="fa fa-home"></i>
-                            <span>Home</span>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Navigation Panel -->
+        <nav class="nav-panel">
+            <div class="nav-section">
+                <h3>Quick Access</h3>
+                <div class="nav-categories">
+                    <div class="nav-category active" data-category="kpis">
+                        <div class="category-icon">
+                            <i class="fas fa-chart-bar"></i>
                         </div>
+                        <div class="category-info">
+                            <h4>KPIs</h4>
+                            <p>Key Performance Indicators</p>
+                        </div>
+                        <div class="category-count">4</div>
                     </div>
-                    <div class="nav-section">
-                        <div class="nav-header expandable">
-                            <i class="fa fa-chevron-right"></i>
-                            <i class="fa fa-chart-bar"></i>
-                            <span>Key Performance Indicators</span>
+                    
+                    <div class="nav-category" data-category="dashboards">
+                        <div class="category-icon">
+                            <i class="fas fa-tachometer-alt"></i>
                         </div>
-                        <div class="nav-submenu">
-                            <div class="nav-item" data-tab="finance">Finance</div>
-                            <div class="nav-item" data-tab="operations">Operations</div>
-                            <div class="nav-item" data-tab="patient-experience">Patient Experience</div>
-                            <div class="nav-item" data-tab="quality">Quality</div>
+                        <div class="category-info">
+                            <h4>Dashboards</h4>
+                            <p>Visual Analytics</p>
                         </div>
+                        <div class="category-count">4</div>
                     </div>
-                    <div class="nav-section">
-                        <div class="nav-header expandable">
-                            <i class="fa fa-chevron-right"></i>
-                            <i class="fa fa-tachometer"></i>
-                            <span>Dashboards</span>
+                    
+                    <div class="nav-category" data-category="reports">
+                        <div class="category-icon">
+                            <i class="fas fa-file-alt"></i>
                         </div>
-                        <div class="nav-submenu">
-                            <div class="nav-item" data-dashboard="finance">Finance Dashboard</div>
-                            <div class="nav-item" data-dashboard="infusion">Infusion Dashboard</div>
-                            <div class="nav-item" data-dashboard="medonc">MedOnc Dashboard</div>
-                            <div class="nav-item" data-dashboard="radonc">RadOnc Dashboard</div>
+                        <div class="category-info">
+                            <h4>Reports</h4>
+                            <p>Detailed Reports</p>
                         </div>
-                    </div>
-                    <div class="nav-section">
-                        <div class="nav-header expandable">
-                            <i class="fa fa-chevron-right"></i>
-                            <i class="fa fa-folder"></i>
-                            <span>Reports</span>
-                        </div>
-                        <div class="nav-submenu" id="reportsTree">
-                            <!-- Reports tree will be populated here -->
-                        </div>
+                        <div class="category-count">60+</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Content Area -->
-            <div class="content-area">
-                <!-- Tab Bar -->
-                <div class="tab-bar">
-                    <div class="tab active" data-tab="home">
-                        <span>Home</span>
-                        <button class="tab-close">×</button>
+            
+            <div class="nav-section">
+                <h3>Recent</h3>
+                <div class="recent-items">
+                    <div class="recent-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Finance KPIs</span>
+                    </div>
+                    <div class="recent-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Finance Dashboard</span>
+                    </div>
+                    <div class="recent-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Revenue Report</span>
                     </div>
                 </div>
+            </div>
+        </nav>
 
-                <!-- Tab Content -->
-                <div class="tab-content">
-                    <!-- Home Tab -->
-                    <div class="tab-pane active" id="home">
-                        <div class="content-header">
-                            <h2>Welcome to eLibera Business Intelligence System</h2>
-                            <p>Select a report or dashboard from the navigation panel to begin.</p>
+        <!-- Center Content Area -->
+        <main class="content-area">
+            <!-- KPIs Section -->
+            <section class="content-section active" id="kpis-section">
+                <div class="section-header">
+                    <h2>Key Performance Indicators</h2>
+                    <div class="section-tabs">
+                        <button class="tab-btn active" data-tab="finance">Finance</button>
+                        <button class="tab-btn" data-tab="operations">Operations</button>
+                        <button class="tab-btn" data-tab="patient-experience">Patient Experience</button>
+                        <button class="tab-btn" data-tab="quality">Quality</button>
+                    </div>
+                </div>
+                
+                <div class="kpi-content">
+                    <div class="kpi-tab-content active" id="finance-kpis">
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="kpi-trend positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>+12.5%</span>
+                                    </div>
+                                </div>
+                                <div class="kpi-value">52,319</div>
+                                <div class="kpi-label">Patient Count YTD</div>
+                            </div>
+                            
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="kpi-trend positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>+8.3%</span>
+                                    </div>
+                                </div>
+                                <div class="kpi-value">3,211</div>
+                                <div class="kpi-label">Patient Visits YTD</div>
+                            </div>
+                            
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon">
+                                        <i class="fas fa-hospital"></i>
+                                    </div>
+                                    <div class="kpi-trend negative">
+                                        <i class="fas fa-arrow-down"></i>
+                                        <span>-2.1%</span>
+                                    </div>
+                                </div>
+                                <div class="kpi-value">16,500</div>
+                                <div class="kpi-label">Inpatient Count</div>
+                            </div>
+                            
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon">
+                                        <i class="fas fa-ambulance"></i>
+                                    </div>
+                                    <div class="kpi-trend positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>+5.7%</span>
+                                    </div>
+                                </div>
+                                <div class="kpi-value">5,855</div>
+                                <div class="kpi-label">Emergency Visits</div>
+                            </div>
                         </div>
-                        <div class="welcome-content">
-                            <div class="welcome-section">
-                                <h3>Quick Access</h3>
-                                <div class="quick-access-grid">
-                                    <div class="quick-access-item" data-action="kpi-finance">
-                                        <i class="fa fa-chart-line"></i>
-                                        <span>Finance KPIs</span>
+                        
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <h3>Patient Count & Visits by Month</h3>
+                                    <div class="chart-actions">
+                                        <button class="action-btn">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                        <button class="action-btn">
+                                            <i class="fas fa-download"></i>
+                                        </button>
                                     </div>
-                                    <div class="quick-access-item" data-action="dashboard-finance">
-                                        <i class="fa fa-tachometer"></i>
-                                        <span>Finance Dashboard</span>
+                                </div>
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <p>Interactive Chart</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <h3>Total Charges Last 18 Months</h3>
+                                    <div class="chart-actions">
+                                        <button class="action-btn">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                        <button class="action-btn">
+                                            <i class="fas fa-download"></i>
+                                        </button>
                                     </div>
-                                    <div class="quick-access-item" data-action="reports-finance">
-                                        <i class="fa fa-file-text-o"></i>
-                                        <span>Financial Reports</span>
-                                    </div>
-                                    <div class="quick-access-item" data-action="reports-clinical">
-                                        <i class="fa fa-stethoscope"></i>
-                                        <span>Clinical Reports</span>
-                                    </div>
+                                </div>
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-line"></i>
+                                    <p>Interactive Chart</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    <!-- KPI Tab -->
-                    <div class="tab-pane" id="kpi">
-                        <div class="content-header">
-                            <h2 id="kpiTitle">Key Performance Indicators</h2>
-                            <div class="content-actions">
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-refresh"></i>
-                                    Refresh
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fa fa-download"></i>
-                                    Export
-                                </button>
+            <!-- Dashboards Section -->
+            <section class="content-section" id="dashboards-section">
+                <div class="section-header">
+                    <h2>Dashboards</h2>
+                    <div class="section-actions">
+                        <button class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            New Dashboard
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="dashboard-preview">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="dashboard-info">
+                            <h3>Finance Dashboard</h3>
+                            <p>Financial metrics and revenue analysis</p>
+                            <div class="dashboard-meta">
+                                <span class="report-count">12 reports</span>
+                                <span class="last-updated">Updated 2 hours ago</span>
                             </div>
                         </div>
-                        <div class="kpi-content">
-                            <div class="kpi-grid" id="kpiGrid">
-                                <!-- KPI cards will be populated here -->
-                            </div>
-                            <div class="charts-section">
-                                <div class="chart-container">
-                                    <div class="chart-header">
-                                        <h3>Patient Count & Visits by Month</h3>
-                                        <div class="chart-controls">
-                                            <button class="btn btn-small">Export</button>
-                                            <button class="btn btn-small">Print</button>
-                                        </div>
-                                    </div>
-                                    <div class="chart-placeholder">
-                                        <i class="fa fa-bar-chart"></i>
-                                        <p>Chart will be displayed here</p>
-                                    </div>
-                                </div>
-                                <div class="chart-container">
-                                    <div class="chart-header">
-                                        <h3>Total Charges Last 18 Months</h3>
-                                        <div class="chart-controls">
-                                            <button class="btn btn-small">Export</button>
-                                            <button class="btn btn-small">Print</button>
-                                        </div>
-                                    </div>
-                                    <div class="chart-placeholder">
-                                        <i class="fa fa-line-chart"></i>
-                                        <p>Chart will be displayed here</p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="dashboard-actions">
+                            <button class="btn-view" data-dashboard="finance">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Dashboard Tab -->
-                    <div class="tab-pane" id="dashboard">
-                        <div class="content-header">
-                            <h2 id="dashboardTitle">Dashboard</h2>
-                            <div class="content-actions">
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-refresh"></i>
-                                    Refresh
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fa fa-download"></i>
-                                    Export
-                                </button>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-preview">
+                            <i class="fas fa-infusion"></i>
+                        </div>
+                        <div class="dashboard-info">
+                            <h3>Finance Dashboard - Infusion</h3>
+                            <p>Infusion center financial tracking</p>
+                            <div class="dashboard-meta">
+                                <span class="report-count">8 reports</span>
+                                <span class="last-updated">Updated 1 hour ago</span>
                             </div>
                         </div>
-                        <div class="dashboard-content">
-                            <div class="dashboard-reports" id="dashboardReports">
-                                <!-- Dashboard reports will be populated here -->
-                            </div>
+                        <div class="dashboard-actions">
+                            <button class="btn-view" data-dashboard="infusion">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Reports Tab -->
-                    <div class="tab-pane" id="reports">
-                        <div class="content-header">
-                            <h2 id="reportsTitle">Reports</h2>
-                            <div class="content-actions">
-                                <div class="search-box">
-                                    <input type="text" placeholder="Search reports..." id="reportSearch">
-                                    <button class="btn btn-primary">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                                <button class="btn btn-secondary">
-                                    <i class="fa fa-filter"></i>
-                                    Filter
-                                </button>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-preview">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="dashboard-info">
+                            <h3>Finance Dashboard - MedOnc</h3>
+                            <p>Medical oncology financial reports</p>
+                            <div class="dashboard-meta">
+                                <span class="report-count">15 reports</span>
+                                <span class="last-updated">Updated 30 min ago</span>
                             </div>
                         </div>
-                        <div class="reports-content">
-                            <div class="reports-list" id="reportsList">
-                                <!-- Reports list will be populated here -->
-                            </div>
+                        <div class="dashboard-actions">
+                            <button class="btn-view" data-dashboard="medonc">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Report Viewer Tab -->
-                    <div class="tab-pane" id="report-viewer">
-                        <div class="content-header">
-                            <h2 id="reportViewerTitle">Report Viewer</h2>
-                            <div class="content-actions">
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-refresh"></i>
-                                    Refresh
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fa fa-download"></i>
-                                    Export
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fa fa-print"></i>
-                                    Print
-                                </button>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-preview">
+                            <i class="fas fa-radiation"></i>
+                        </div>
+                        <div class="dashboard-info">
+                            <h3>Finance Dashboard - RadOnc</h3>
+                            <p>Radiation oncology financial data</p>
+                            <div class="dashboard-meta">
+                                <span class="report-count">10 reports</span>
+                                <span class="last-updated">Updated 45 min ago</span>
                             </div>
                         </div>
-                        <div class="report-viewer-content">
-                            <div class="report-placeholder">
-                                <i class="fa fa-file-text-o"></i>
-                                <p>Power BI Report will be embedded here</p>
-                            </div>
+                        <div class="dashboard-actions">
+                            <button class="btn-view" data-dashboard="radonc">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section class="content-section" id="reports-section">
+                <div class="section-header">
+                    <h2>Reports</h2>
+                    <div class="section-actions">
+                        <div class="view-toggle">
+                            <button class="toggle-btn active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="toggle-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reports-filters">
+                    <div class="filter-group">
+                        <label>Category:</label>
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="finance">Finance</option>
+                            <option value="clinical">Clinical</option>
+                            <option value="operations">Operations</option>
+                            <option value="quality">Quality</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort by:</label>
+                        <select id="sortFilter">
+                            <option value="name">Name</option>
+                            <option value="date">Date</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="reports-grid" id="reportsGrid">
+                    <!-- Reports will be dynamically loaded here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <div class="panel-section">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions">
+                    <button class="quick-action-btn">
+                        <i class="fas fa-star"></i>
+                        <span>Favorites</span>
+                    </button>
+                    <button class="quick-action-btn">
+                        <i class="fas fa-clock"></i>
+                        <span>Recent</span>
+                    </button>
+                    <button class="quick-action-btn">
+                        <i class="fas fa-download"></i>
+                        <span>Export</span>
+                    </button>
+                    <button class="quick-action-btn">
+                        <i class="fas fa-print"></i>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <h3>System Status</h3>
+                <div class="status-items">
+                    <div class="status-item">
+                        <div class="status-indicator online"></div>
+                        <span>Database</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator online"></div>
+                        <span>Power BI Service</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator warning"></div>
+                        <span>Cache</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <h3>Notifications</h3>
+                <div class="notifications">
+                    <div class="notification-item">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="notification-content">
+                            <p>Data refresh completed</p>
+                            <span>2 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="notification-content">
+                            <p>Cache needs attention</p>
+                            <span>15 minutes ago</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-left">
-                <span class="status-item">Ready</span>
-                <span class="status-item">User: John Doe</span>
-                <span class="status-item">Department: Oncology and Women's Services</span>
-            </div>
-            <div class="status-right">
-                <span class="status-item">Last Updated: <span id="lastUpdated">2 hours ago</span></span>
-                <span class="status-item">Records: <span id="recordCount">0</span></span>
-            </div>
-        </div>
+        </aside>
     </div>
 
-    <!-- Context Menu -->
-    <div class="context-menu" id="contextMenu">
-        <div class="context-item">Open</div>
-        <div class="context-item">Edit</div>
-        <div class="context-item">Copy</div>
-        <div class="context-separator"></div>
-        <div class="context-item">Delete</div>
-        <div class="context-separator"></div>
-        <div class="context-item">Properties</div>
+    <!-- Report Viewer Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Report Viewer</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="report-viewer">
+                    <div class="report-placeholder">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Power BI Report will be embedded here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
