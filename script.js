@@ -1,343 +1,395 @@
-// jQuery-based Power BI Front-end Application
+// Classic Business Application JavaScript
 $(document).ready(function() {
     'use strict';
     
-    // Initialize the application
-    initializeApp();
+    // Initialize the classic application
+    initializeClassicApp();
     
-    function initializeApp() {
-        loadKPIs();
-        loadDashboards();
-        loadReports();
+    function initializeClassicApp() {
+        updateSystemTime();
         setupEventListeners();
-        setupSearchFunctionality();
-        setupModals();
-        startAutoRefresh();
+        loadReportsTree();
+        setupContextMenu();
+        setupKeyboardShortcuts();
+        
+        // Update time every second
+        setInterval(updateSystemTime, 1000);
     }
     
-    // KPI Management
-    function loadKPIs() {
-        const kpiData = appData.kpis;
-        
-        // Load KPI tabs
-        $('.kpi-tabs').empty();
-        Object.keys(kpiData).forEach(tabKey => {
-            const tab = kpiData[tabKey];
-            const tabButton = $(`<button class="kpi-tab" data-tab="${tabKey}">${tab.title}</button>`);
-            if (tabKey === 'finance') {
-                tabButton.addClass('active');
-            }
-            $('.kpi-tabs').append(tabButton);
+    // System Time Display
+    function updateSystemTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         });
-        
-        // Load initial KPI content (Finance)
-        loadKPIContent('finance');
-    }
-    
-    function loadKPIContent(tabKey) {
-        const kpiData = appData.kpis[tabKey];
-        if (!kpiData) return;
-        
-        const kpiCards = $('.kpi-cards');
-        kpiCards.empty();
-        
-        kpiData.cards.forEach(card => {
-            const cardHtml = `
-                <div class="kpi-card" data-card-id="${card.id}">
-                    <div class="kpi-icon">
-                        <i class="${card.icon}"></i>
-                    </div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${card.value}</div>
-                        <div class="kpi-label">${card.label}</div>
-                        <div class="kpi-trend ${card.trendType}">
-                            <i class="fas fa-arrow-${card.trendType === 'positive' ? 'up' : 'down'}"></i>
-                            <span>${card.trend}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            kpiCards.append(cardHtml);
-        });
-        
-        // Add animation to cards
-        $('.kpi-card').each(function(index) {
-            $(this).css('animation-delay', `${index * 0.1}s`);
-            $(this).addClass('animate-in');
-        });
-    }
-    
-    // Dashboard Management
-    function loadDashboards() {
-        const dashboardGrid = $('.dashboard-grid');
-        dashboardGrid.empty();
-        
-        appData.dashboards.forEach(dashboard => {
-            const dashboardHtml = `
-                <div class="dashboard-card" data-dashboard-id="${dashboard.id}">
-                    <div class="dashboard-icon">
-                        <i class="${dashboard.icon}"></i>
-                    </div>
-                    <div class="dashboard-content">
-                        <h3>${dashboard.title}</h3>
-                        <p>${dashboard.description}</p>
-                        <div class="dashboard-meta">
-                            <span class="report-count">${dashboard.reportCount} reports</span>
-                            <span class="last-updated">Updated ${dashboard.lastUpdated}</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-actions">
-                        <button class="btn-view" data-dashboard="${dashboard.id}">
-                            <i class="fas fa-eye"></i>
-                            View
-                        </button>
-                    </div>
-                </div>
-            `;
-            dashboardGrid.append(dashboardHtml);
-        });
-        
-        // Add animation to dashboard cards
-        $('.dashboard-card').each(function(index) {
-            $(this).css('animation-delay', `${index * 0.1}s`);
-            $(this).addClass('animate-in');
-        });
-    }
-    
-    // Reports Management
-    function loadReports() {
-        const reportsGrid = $('#reportsGrid');
-        reportsGrid.empty();
-        
-        appData.reports.categories.forEach(category => {
-            const reportHtml = `
-                <div class="report-item" data-category="${category.id}" data-type="category">
-                    <div class="report-icon">
-                        <i class="${category.icon}"></i>
-                    </div>
-                    <div class="report-title">${category.name}</div>
-                    <div class="report-description">${category.description}</div>
-                    <div class="report-meta">
-                        <span class="report-count">${category.count} items</span>
-                    </div>
-                </div>
-            `;
-            reportsGrid.append(reportHtml);
-        });
-        
-        // Add animation to report items
-        $('.report-item').each(function(index) {
-            $(this).css('animation-delay', `${index * 0.05}s`);
-            $(this).addClass('animate-in');
-        });
+        $('#systemTime').text(timeString);
     }
     
     // Event Listeners
     function setupEventListeners() {
-        // KPI Tab switching
-        $(document).on('click', '.kpi-tab', function() {
-            const tabKey = $(this).data('tab');
-            
-            $('.kpi-tab').removeClass('active');
-            $(this).addClass('active');
-            
-            loadKPIContent(tabKey);
+        // Menu interactions
+        $('.menu-item').on('click', function(e) {
+            e.stopPropagation();
+            const menuText = $(this).find('span').text();
+            handleMenuAction(menuText);
         });
         
-        // Dashboard view button
-        $(document).on('click', '.btn-view', function() {
-            const dashboardId = $(this).data('dashboard');
-            showDashboardReports(dashboardId);
+        // Toolbar button clicks
+        $('.toolbar-btn').on('click', function() {
+            const title = $(this).attr('title');
+            handleToolbarAction(title);
         });
         
-        // Report item click
-        $(document).on('click', '.report-item', function() {
-            const categoryId = $(this).data('category');
-            const type = $(this).data('type');
+        // Navigation interactions
+        $('.nav-header.expandable').on('click', function() {
+            toggleNavSection($(this));
+        });
+        
+        $('.nav-item').on('click', function() {
+            const tab = $(this).data('tab');
+            const dashboard = $(this).data('dashboard');
             
-            if (type === 'category') {
-                showCategoryReports(categoryId);
-            } else {
-                showReport(categoryId);
+            if (tab) {
+                openKPITab(tab);
+            } else if (dashboard) {
+                openDashboardTab(dashboard);
             }
         });
         
-        // View toggle buttons
-        $(document).on('click', '.toggle-btn', function() {
-            const view = $(this).data('view');
-            
-            $('.toggle-btn').removeClass('active');
-            $(this).addClass('active');
-            
-            toggleReportsView(view);
+        // Tab management
+        $('.tab-close').on('click', function(e) {
+            e.stopPropagation();
+            closeTab($(this).closest('.tab'));
         });
         
-        // Refresh button
-        $(document).on('click', '.btn-refresh', function() {
-            refreshData();
+        // Quick access items
+        $('.quick-access-item').on('click', function() {
+            const action = $(this).data('action');
+            handleQuickAccess(action);
         });
         
-        // Quick action buttons
-        $(document).on('click', '.btn-secondary', function() {
-            const action = $(this).text().trim();
-            handleQuickAction(action);
+        // Button clicks
+        $('.btn').on('click', function() {
+            const buttonText = $(this).text().trim();
+            handleButtonAction(buttonText);
         });
+        
+        // Search functionality
+        $('#reportSearch').on('input', function() {
+            const query = $(this).val();
+            searchReports(query);
+        });
+        
+        // Window controls
+        $('.control-btn').on('click', function() {
+            const action = $(this).hasClass('minimize') ? 'minimize' : 
+                          $(this).hasClass('maximize') ? 'maximize' : 'close';
+            handleWindowControl(action);
+        });
+    }
+    
+    // Navigation Management
+    function toggleNavSection(header) {
+        const submenu = header.next('.nav-submenu');
+        const chevron = header.find('.fa-chevron-right');
+        
+        if (submenu.hasClass('expanded')) {
+            submenu.removeClass('expanded').slideUp(200);
+            header.removeClass('expanded');
+            chevron.removeClass('fa-chevron-down').addClass('fa-chevron-right');
+        } else {
+            submenu.addClass('expanded').slideDown(200);
+            header.addClass('expanded');
+            chevron.removeClass('fa-chevron-right').addClass('fa-chevron-down');
+        }
+    }
+    
+    // Tab Management
+    function openTab(tabId, title, content) {
+        // Check if tab already exists
+        let existingTab = $(`.tab[data-tab="${tabId}"]`);
+        
+        if (existingTab.length === 0) {
+            // Create new tab
+            const tabHtml = `
+                <div class="tab" data-tab="${tabId}">
+                    <span>${title}</span>
+                    <button class="tab-close">×</button>
+                </div>
+            `;
+            $('.tab-bar').append(tabHtml);
+            
+            // Create tab content
+            const contentHtml = `
+                <div class="tab-pane" id="${tabId}">
+                    ${content}
+                </div>
+            `;
+            $('.tab-content').append(contentHtml);
+            
+            existingTab = $(`.tab[data-tab="${tabId}"]`);
+        }
+        
+        // Activate tab
+        $('.tab').removeClass('active');
+        $('.tab-pane').removeClass('active');
+        existingTab.addClass('active');
+        $(`#${tabId}`).addClass('active');
+    }
+    
+    function closeTab(tab) {
+        const tabId = tab.data('tab');
+        
+        // Don't close home tab
+        if (tabId === 'home') return;
+        
+        tab.remove();
+        $(`#${tabId}`).remove();
+        
+        // Activate home tab if no tabs left
+        if ($('.tab').length === 0) {
+            $('.tab[data-tab="home"]').addClass('active');
+            $('#home').addClass('active');
+        } else {
+            // Activate the last tab
+            $('.tab').last().addClass('active');
+            $('.tab-pane').last().addClass('active');
+        }
+    }
+    
+    // KPI Management
+    function openKPITab(tabKey) {
+        const kpiData = appData.kpis[tabKey];
+        if (!kpiData) return;
+        
+        const kpiCards = kpiData.cards.map(card => `
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="${card.icon}"></i>
+                </div>
+                <div class="kpi-info">
+                    <div class="kpi-value">${card.value}</div>
+                    <div class="kpi-label">${card.label}</div>
+                    <div class="kpi-trend ${card.trendType}">
+                        <i class="fa fa-arrow-${card.trendType === 'positive' ? 'up' : 'down'}"></i>
+                        <span>${card.trend}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        const content = `
+            <div class="content-header">
+                <h2>${kpiData.title}</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fa fa-refresh"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-grid">
+                    ${kpiCards}
+                </div>
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Patient Count & Visits by Month</h3>
+                            <div class="chart-controls">
+                                <button class="btn btn-small">Export</button>
+                                <button class="btn btn-small">Print</button>
+                            </div>
+                        </div>
+                        <div class="chart-placeholder">
+                            <i class="fa fa-bar-chart"></i>
+                            <p>Chart will be displayed here</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Total Charges Last 18 Months</h3>
+                            <div class="chart-controls">
+                                <button class="btn btn-small">Export</button>
+                                <button class="btn btn-small">Print</button>
+                            </div>
+                        </div>
+                        <div class="chart-placeholder">
+                            <i class="fa fa-line-chart"></i>
+                            <p>Chart will be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        openTab(`kpi-${tabKey}`, kpiData.title, content);
+    }
+    
+    // Dashboard Management
+    function openDashboardTab(dashboardId) {
+        const dashboard = appData.dashboards.find(d => d.id === dashboardId);
+        if (!dashboard) return;
+        
+        const reports = dashboard.reports.map(report => `
+            <div class="dashboard-report-item" data-report-id="${report.id}">
+                <h4>${report.title}</h4>
+                <p>${report.description}</p>
+            </div>
+        `).join('');
+        
+        const content = `
+            <div class="content-header">
+                <h2>${dashboard.title}</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fa fa-refresh"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+            <div class="dashboard-content">
+                <div class="dashboard-reports">
+                    ${reports}
+                </div>
+            </div>
+        `;
+        
+        openTab(`dashboard-${dashboardId}`, dashboard.title, content);
+        
+        // Add click handlers for dashboard reports
+        $(`#dashboard-${dashboardId} .dashboard-report-item`).on('click', function() {
+            const reportId = $(this).data('report-id');
+            openReportViewer(reportId, $(this).find('h4').text());
+        });
+    }
+    
+    // Report Management
+    function loadReportsTree() {
+        const reportsTree = $('#reportsTree');
+        reportsTree.empty();
+        
+        // Show first 10 categories for performance
+        const categories = appData.reports.categories.slice(0, 10);
+        
+        categories.forEach(category => {
+            const categoryHtml = `
+                <div class="nav-item" data-category="${category.id}">
+                    <i class="${category.icon}"></i>
+                    ${category.name} (${category.count})
+                </div>
+            `;
+            reportsTree.append(categoryHtml);
+        });
+        
+        // Add click handlers
+        $('.nav-item[data-category]').on('click', function() {
+            const categoryId = $(this).data('category');
+            openReportsTab(categoryId);
+        });
+    }
+    
+    function openReportsTab(categoryId) {
+        const category = appData.reports.categories.find(c => c.id === categoryId);
+        if (!category) return;
+        
+        const reports = category.reports.map(report => `
+            <div class="report-item" data-report-id="${report.id}">
+                <div class="report-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+                <div class="report-info">
+                    <div class="report-title">${report.title}</div>
+                    <div class="report-description">Report</div>
+                </div>
+            </div>
+        `).join('');
+        
+        const content = `
+            <div class="content-header">
+                <h2>${category.name} Reports</h2>
+                <div class="content-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search reports..." id="reportSearch">
+                        <button class="btn btn-primary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-filter"></i>
+                        Filter
+                    </button>
+                </div>
+            </div>
+            <div class="reports-content">
+                <div class="reports-list">
+                    ${reports}
+                </div>
+            </div>
+        `;
+        
+        openTab(`reports-${categoryId}`, `${category.name} Reports`, content);
+        
+        // Add click handlers for reports
+        $(`#reports-${categoryId} .report-item`).on('click', function() {
+            const reportId = $(this).data('report-id');
+            openReportViewer(reportId, $(this).find('.report-title').text());
+        });
+    }
+    
+    function openReportViewer(reportId, reportTitle) {
+        const content = `
+            <div class="content-header">
+                <h2>${reportTitle}</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fa fa-refresh"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-download"></i>
+                        Export
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-print"></i>
+                        Print
+                    </button>
+                </div>
+            </div>
+            <div class="report-viewer-content">
+                <div class="report-placeholder">
+                    <i class="fa fa-file-text-o"></i>
+                    <p>Power BI Report will be embedded here</p>
+                </div>
+            </div>
+        `;
+        
+        openTab(`report-${reportId}`, reportTitle, content);
     }
     
     // Search Functionality
-    function setupSearchFunctionality() {
-        // Global search
-        $('#globalSearch').on('input', function() {
-            const query = $(this).val().toLowerCase();
-            performGlobalSearch(query);
-        });
-        
-        // Report search
-        $('#reportSearch').on('input', function() {
-            const query = $(this).val().toLowerCase();
-            filterReports(query);
-        });
-        
-        // Category filter
-        $('#categoryFilter').on('change', function() {
-            const category = $(this).val();
-            filterReportsByCategory(category);
-        });
-        
-        // Search button
-        $('.search-btn').on('click', function() {
-            const query = $('#globalSearch').val();
-            if (query) {
-                performGlobalSearch(query);
-            }
-        });
-    }
-    
-    function performGlobalSearch(query) {
+    function searchReports(query) {
         if (!query) {
-            loadReports();
-            return;
-        }
-        
-        const results = [];
-        
-        // Search in reports
-        appData.reports.categories.forEach(category => {
-            if (category.name.toLowerCase().includes(query) || 
-                category.description.toLowerCase().includes(query)) {
-                results.push({
-                    type: 'category',
-                    data: category,
-                    match: category.name
-                });
-            }
-            
-            category.reports.forEach(report => {
-                if (report.title.toLowerCase().includes(query)) {
-                    results.push({
-                        type: 'report',
-                        data: report,
-                        match: report.title,
-                        category: category.name
-                    });
-                }
-            });
-        });
-        
-        // Search in dashboards
-        appData.dashboards.forEach(dashboard => {
-            if (dashboard.title.toLowerCase().includes(query) || 
-                dashboard.description.toLowerCase().includes(query)) {
-                results.push({
-                    type: 'dashboard',
-                    data: dashboard,
-                    match: dashboard.title
-                });
-            }
-        });
-        
-        displaySearchResults(results);
-    }
-    
-    function displaySearchResults(results) {
-        const reportsGrid = $('#reportsGrid');
-        reportsGrid.empty();
-        
-        if (results.length === 0) {
-            reportsGrid.html('<div class="text-center" style="grid-column: 1/-1; padding: 2rem; color: #666;">No results found</div>');
-            return;
-        }
-        
-        results.forEach(result => {
-            let html = '';
-            
-            if (result.type === 'category') {
-                html = `
-                    <div class="report-item" data-category="${result.data.id}" data-type="category">
-                        <div class="report-icon">
-                            <i class="${result.data.icon}"></i>
-                        </div>
-                        <div class="report-title">${result.data.name}</div>
-                        <div class="report-description">${result.data.description}</div>
-                        <div class="report-meta">
-                            <span class="report-count">${result.data.count} items</span>
-                        </div>
-                    </div>
-                `;
-            } else if (result.type === 'report') {
-                html = `
-                    <div class="report-item" data-report-id="${result.data.id}" data-type="report">
-                        <div class="report-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="report-title">${result.data.title}</div>
-                        <div class="report-description">${result.data.description || 'Report'}</div>
-                        <div class="report-meta">
-                            <span class="report-count">${result.category || 'Report'}</span>
-                        </div>
-                    </div>
-                `;
-            } else if (result.type === 'dashboard') {
-                html = `
-                    <div class="report-item" data-dashboard-id="${result.data.id}" data-type="dashboard">
-                        <div class="report-icon">
-                            <i class="${result.data.icon}"></i>
-                        </div>
-                        <div class="report-title">${result.data.title}</div>
-                        <div class="report-description">${result.data.description}</div>
-                        <div class="report-meta">
-                            <span class="report-count">${result.data.reportCount} reports</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            reportsGrid.append(html);
-        });
-    }
-    
-    function filterReports(query) {
-        $('.report-item').each(function() {
-            const title = $(this).find('.report-title').text().toLowerCase();
-            const description = $(this).find('.report-description').text().toLowerCase();
-            
-            if (title.includes(query) || description.includes(query)) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-    }
-    
-    function filterReportsByCategory(category) {
-        if (!category) {
             $('.report-item').show();
             return;
         }
         
         $('.report-item').each(function() {
-            const itemCategory = $(this).data('category');
-            if (itemCategory === category) {
+            const title = $(this).find('.report-title').text().toLowerCase();
+            const description = $(this).find('.report-description').text().toLowerCase();
+            
+            if (title.includes(query.toLowerCase()) || description.includes(query.toLowerCase())) {
                 $(this).show();
             } else {
                 $(this).hide();
@@ -345,195 +397,224 @@ $(document).ready(function() {
         });
     }
     
-    // Modal Management
-    function setupModals() {
-        // Close modals
-        $(document).on('click', '.modal-close, .modal', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-        
-        // Close on escape key
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-    }
-    
-    function showDashboardReports(dashboardId) {
-        const dashboard = appData.dashboards.find(d => d.id === dashboardId);
-        if (!dashboard) return;
-        
-        const modal = $('#dashboardModal');
-        const modalTitle = $('#dashboardModalTitle');
-        const dashboardReports = $('#dashboardReports');
-        
-        modalTitle.text(`${dashboard.title} - Reports`);
-        dashboardReports.empty();
-        
-        dashboard.reports.forEach(report => {
-            const reportHtml = `
-                <div class="report-item" data-report-id="${report.id}" data-type="report">
-                    <div class="report-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="report-title">${report.title}</div>
-                    <div class="report-description">${report.description}</div>
-                    <div class="report-meta">
-                        <span class="report-count">Report</span>
-                    </div>
-                </div>
-            `;
-            dashboardReports.append(reportHtml);
-        });
-        
-        modal.addClass('show');
-    }
-    
-    function showCategoryReports(categoryId) {
-        const category = appData.reports.categories.find(c => c.id === categoryId);
-        if (!category) return;
-        
-        const modal = $('#dashboardModal');
-        const modalTitle = $('#dashboardModalTitle');
-        const dashboardReports = $('#dashboardReports');
-        
-        modalTitle.text(`${category.name} - Reports`);
-        dashboardReports.empty();
-        
-        category.reports.forEach(report => {
-            const reportHtml = `
-                <div class="report-item" data-report-id="${report.id}" data-type="report">
-                    <div class="report-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="report-title">${report.title}</div>
-                    <div class="report-description">Report</div>
-                    <div class="report-meta">
-                        <span class="report-count">Report</span>
-                    </div>
-                </div>
-            `;
-            dashboardReports.append(reportHtml);
-        });
-        
-        modal.addClass('show');
-    }
-    
-    function showReport(reportId) {
-        const modal = $('#reportModal');
-        const modalTitle = $('#modalTitle');
-        
-        modalTitle.text(`Report: ${reportId}`);
-        modal.addClass('show');
-    }
-    
-    function closeModal() {
-        $('.modal').removeClass('show');
-    }
-    
-    // View Toggle
-    function toggleReportsView(view) {
-        const reportsGrid = $('#reportsGrid');
-        
-        if (view === 'list') {
-            reportsGrid.css('grid-template-columns', '1fr');
-            $('.report-item').css('display', 'flex');
-        } else {
-            reportsGrid.css('grid-template-columns', 'repeat(auto-fill, minmax(280px, 1fr))');
-            $('.report-item').css('display', 'block');
-        }
-    }
-    
-    // Quick Actions
-    function handleQuickAction(action) {
+    // Quick Access
+    function handleQuickAccess(action) {
         switch(action) {
-            case 'Favorites':
-                showFavorites();
+            case 'kpi-finance':
+                openKPITab('finance');
                 break;
-            case 'Recent':
-                showRecent();
+            case 'dashboard-finance':
+                openDashboardTab('finance');
                 break;
-            case 'Filters':
-                showFilters();
+            case 'reports-finance':
+                openReportsTab('finance');
+                break;
+            case 'reports-clinical':
+                openReportsTab('clinical');
                 break;
         }
     }
     
-    function showFavorites() {
-        // Implementation for favorites
-        console.log('Showing favorites');
+    // Menu Actions
+    function handleMenuAction(menuText) {
+        switch(menuText) {
+            case 'File':
+                // File menu actions
+                break;
+            case 'Edit':
+                // Edit menu actions
+                break;
+            case 'View':
+                // View menu actions
+                break;
+            case 'Tools':
+                // Tools menu actions
+                break;
+            case 'Help':
+                // Help menu actions
+                break;
+        }
     }
     
-    function showRecent() {
-        // Implementation for recent reports
-        console.log('Showing recent reports');
+    // Toolbar Actions
+    function handleToolbarAction(title) {
+        switch(title) {
+            case 'New Report':
+                showMessage('New Report functionality');
+                break;
+            case 'Open Report':
+                showMessage('Open Report functionality');
+                break;
+            case 'Save Report':
+                showMessage('Save Report functionality');
+                break;
+            case 'Print':
+                showMessage('Print functionality');
+                break;
+            case 'Export':
+                showMessage('Export functionality');
+                break;
+            case 'Refresh':
+                refreshData();
+                break;
+            case 'Search':
+                $('#reportSearch').focus();
+                break;
+            case 'Settings':
+                showMessage('Settings functionality');
+                break;
+        }
     }
     
-    function showFilters() {
-        // Implementation for advanced filters
-        console.log('Showing filters');
+    // Button Actions
+    function handleButtonAction(buttonText) {
+        switch(buttonText) {
+            case 'Refresh':
+                refreshData();
+                break;
+            case 'Export':
+                showMessage('Export functionality');
+                break;
+            case 'Print':
+                showMessage('Print functionality');
+                break;
+            case 'Filter':
+                showMessage('Filter functionality');
+                break;
+        }
+    }
+    
+    // Window Controls
+    function handleWindowControl(action) {
+        switch(action) {
+            case 'minimize':
+                showMessage('Application minimized');
+                break;
+            case 'maximize':
+                showMessage('Application maximized');
+                break;
+            case 'close':
+                if (confirm('Are you sure you want to close the application?')) {
+                    showMessage('Application closed');
+                }
+                break;
+        }
+    }
+    
+    // Context Menu
+    function setupContextMenu() {
+        $(document).on('contextmenu', '.report-item, .dashboard-report-item, .nav-item', function(e) {
+            e.preventDefault();
+            showContextMenu(e.pageX, e.pageY);
+        });
+        
+        $(document).on('click', function() {
+            hideContextMenu();
+        });
+    }
+    
+    function showContextMenu(x, y) {
+        const contextMenu = $('#contextMenu');
+        contextMenu.css({
+            left: x,
+            top: y,
+            display: 'block'
+        });
+    }
+    
+    function hideContextMenu() {
+        $('#contextMenu').hide();
+    }
+    
+    // Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+        $(document).on('keydown', function(e) {
+            // Ctrl+N - New Report
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                handleToolbarAction('New Report');
+            }
+            
+            // Ctrl+O - Open Report
+            if (e.ctrlKey && e.key === 'o') {
+                e.preventDefault();
+                handleToolbarAction('Open Report');
+            }
+            
+            // Ctrl+S - Save Report
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                handleToolbarAction('Save Report');
+            }
+            
+            // Ctrl+P - Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                handleToolbarAction('Print');
+            }
+            
+            // F5 - Refresh
+            if (e.key === 'F5') {
+                e.preventDefault();
+                refreshData();
+            }
+            
+            // Ctrl+F - Search
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                $('#reportSearch').focus();
+            }
+            
+            // Escape - Close context menu
+            if (e.key === 'Escape') {
+                hideContextMenu();
+            }
+        });
     }
     
     // Data Refresh
     function refreshData() {
-        const refreshBtn = $('.btn-refresh');
-        const icon = refreshBtn.find('i');
-        
-        // Add spinning animation
-        icon.addClass('fa-spin');
+        showMessage('Refreshing data...', 'info');
         
         // Simulate data refresh
         setTimeout(() => {
-            icon.removeClass('fa-spin');
-            
-            // Reload data
-            loadKPIs();
-            loadDashboards();
-            loadReports();
-            
-            // Show success message
-            showNotification('Data refreshed successfully', 'success');
-        }, 2000);
+            updateLastUpdated();
+            showMessage('Data refreshed successfully', 'success');
+        }, 1500);
     }
     
-    function startAutoRefresh() {
-        if (appData.settings.autoRefresh) {
-            setInterval(() => {
-                refreshData();
-            }, appData.settings.refreshInterval);
-        }
+    function updateLastUpdated() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        $('#lastUpdated').text(`${timeString}`);
     }
     
-    // Notifications
-    function showNotification(message, type = 'info') {
-        const notification = $(`
-            <div class="notification notification-${type}">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+    // Message System
+    function showMessage(message, type = 'info') {
+        // Create message element
+        const messageEl = $(`
+            <div class="message message-${type}">
+                <i class="fa fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                 <span>${message}</span>
-                <button class="notification-close">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
         `);
         
-        $('body').append(notification);
+        // Add to body
+        $('body').append(messageEl);
         
-        // Auto remove after 3 seconds
+        // Show message
+        messageEl.fadeIn(300);
+        
+        // Auto hide after 3 seconds
         setTimeout(() => {
-            notification.fadeOut(() => {
-                notification.remove();
+            messageEl.fadeOut(300, function() {
+                $(this).remove();
             });
         }, 3000);
-        
-        // Manual close
-        notification.find('.notification-close').on('click', function() {
-            notification.fadeOut(() => {
-                notification.remove();
-            });
-        });
     }
     
     // Utility Functions
@@ -550,120 +631,15 @@ $(document).ready(function() {
     }
     
     // Add debounced search
-    const debouncedSearch = debounce(performGlobalSearch, 300);
-    $('#globalSearch').on('input', function() {
-        debouncedSearch($(this).val().toLowerCase());
+    const debouncedSearch = debounce(searchReports, 300);
+    $(document).on('input', '#reportSearch', function() {
+        debouncedSearch($(this).val());
     });
     
-    // Add loading states
-    function showLoading(element) {
-        element.addClass('loading');
-    }
+    // Initialize with welcome message
+    setTimeout(() => {
+        showMessage('Welcome to eLibera Business Intelligence System', 'success');
+    }, 1000);
     
-    function hideLoading(element) {
-        element.removeClass('loading');
-    }
-    
-    // Add smooth scrolling
-    $('a[href^="#"]').on('click', function(e) {
-        e.preventDefault();
-        const target = $($(this).attr('href'));
-        if (target.length) {
-            $('html, body').animate({
-                scrollTop: target.offset().top - 100
-            }, 500);
-        }
-    });
-    
-    // Add keyboard shortcuts
-    $(document).on('keydown', function(e) {
-        // Ctrl/Cmd + K for search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            $('#globalSearch').focus();
-        }
-        
-        // Ctrl/Cmd + R for refresh
-        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-            e.preventDefault();
-            refreshData();
-        }
-    });
-    
-    // Add tooltips
-    $('[title]').each(function() {
-        const title = $(this).attr('title');
-        $(this).removeAttr('title');
-        $(this).attr('data-tooltip', title);
-    });
-    
-    // Initialize tooltips
-    $('[data-tooltip]').hover(
-        function() {
-            const tooltip = $(`<div class="tooltip">${$(this).data('tooltip')}</div>`);
-            $('body').append(tooltip);
-            
-            const rect = this.getBoundingClientRect();
-            tooltip.css({
-                top: rect.top - tooltip.outerHeight() - 5,
-                left: rect.left + (rect.width / 2) - (tooltip.outerWidth() / 2)
-            });
-        },
-        function() {
-            $('.tooltip').remove();
-        }
-    );
-    
-    // Add responsive behavior
-    function handleResize() {
-        const width = $(window).width();
-        
-        if (width < 768) {
-            $('.kpi-cards').css('grid-template-columns', '1fr');
-            $('.dashboard-grid').css('grid-template-columns', '1fr');
-            $('.reports-grid').css('grid-template-columns', '1fr');
-        } else if (width < 1024) {
-            $('.kpi-cards').css('grid-template-columns', 'repeat(2, 1fr)');
-            $('.dashboard-grid').css('grid-template-columns', 'repeat(2, 1fr)');
-            $('.reports-grid').css('grid-template-columns', 'repeat(auto-fill, minmax(250px, 1fr))');
-        } else {
-            $('.kpi-cards').css('grid-template-columns', 'repeat(4, 1fr)');
-            $('.dashboard-grid').css('grid-template-columns', 'repeat(auto-fit, minmax(300px, 1fr))');
-            $('.reports-grid').css('grid-template-columns', 'repeat(auto-fill, minmax(280px, 1fr))');
-        }
-    }
-    
-    $(window).on('resize', debounce(handleResize, 250));
-    handleResize(); // Initial call
-    
-    // Add animation classes
-    $('.kpi-card, .dashboard-card, .report-item').addClass('animate-in');
-    
-    // Performance optimization
-    function optimizePerformance() {
-        // Lazy load images
-        $('img[data-src]').each(function() {
-            const img = $(this);
-            if (isElementInViewport(img[0])) {
-                img.attr('src', img.data('src'));
-                img.removeAttr('data-src');
-            }
-        });
-    }
-    
-    function isElementInViewport(el) {
-        const rect = el.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
-    }
-    
-    // Initialize performance optimization
-    $(window).on('scroll', debounce(optimizePerformance, 100));
-    optimizePerformance();
-    
-    console.log('Power BI Front-end Application initialized successfully');
+    console.log('Classic Business Application initialized successfully');
 });
